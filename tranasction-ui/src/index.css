@@ -1,0 +1,12 @@
+.row-new {
+  animation: rowFlash 0.8s ease-out;
+}
+
+@keyframes rowFlash {
+  0% {
+    background-color: rgba(34, 197, 94, 0.3);
+  }
+  100% {
+    background-color: inherit;
+  }
+}
