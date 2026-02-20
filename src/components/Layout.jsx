@@ -1,12 +1,10 @@
+// src/components/Layout.jsx
 
 import { useState } from "react";
 import {
-  AppBar,
-  Toolbar,
-  Typography,
   Box,
-  IconButton,
   Drawer,
+  Toolbar,
   List,
   ListItemButton,
   ListItemIcon,
@@ -14,116 +12,112 @@ import {
   Divider,
 } from "@mui/material";
 
-import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import HistoryIcon from "@mui/icons-material/History";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LightModeIcon from "@mui/icons-material/LightMode";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
-import GlobalSearch from "./GlobalSearch";
-import AutoRefresh from "./AutoRefresh";
+import { useNavigate, useLocation } from "react-router-dom";
+import Navbar from "./Navbar";
 
 const drawerWidth = 240;
 
 export default function Layout({
   children,
-  search,
-  setSearch,
+  toggleTheme,
+  mode,
+  notifications = [],
   autoRefresh,
   setAutoRefresh,
-  lastUpdated,
-  mode,
-  toggleTheme,
 }) {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
-    { text: "Dashboard", icon: <DashboardIcon />, path: "/" },
-    { text: "Transfers", icon: <SwapHorizIcon />, path: "/transfers" },
-    { text: "History", icon: <HistoryIcon />, path: "/history" },
+    { label: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
+    { label: "Transfers", icon: <SwapHorizIcon />, path: "/transfers" },
+    { label: "History", icon: <HistoryIcon />, path: "/history" },
+    { label: "Analytics", icon: <AnalyticsIcon />, path: "/analytics" },
+    { label: "Wallet", icon: <AccountBalanceWalletIcon />, path: "/wallet" },
   ];
-
-  const handleDrawerOpen = () => setIsDrawerOpen(true);
-  const handleDrawerClose = () => setIsDrawerOpen(false);
 
   return (
     <Box sx={{ display: "flex" }}>
-      <AppBar position="fixed">
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={handleDrawerOpen}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+      {/* ================= NAVBAR ================= */}
+      <Navbar
+        toggleTheme={toggleTheme}
+        mode={mode}
+        notifications={notifications}
+        onMenuClick={() => setDrawerOpen(true)}
+        autoRefresh={autoRefresh}
+        setAutoRefresh={setAutoRefresh}
+      />
 
-          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            FINTECHOS
-          </Typography>
-
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <GlobalSearch value={search} onChange={setSearch} />
-            <AutoRefresh
-              enabled={autoRefresh}
-              onToggle={() => setAutoRefresh((prev) => !prev)}
-              lastUpdated={lastUpdated}
-            />
-            <IconButton color="inherit" onClick={toggleTheme}>
-              {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
-            <Typography variant="body2">Admin • Fintech</Typography>
-            <IconButton color="inherit">
-              <AccountCircleIcon />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
+      {/* ================= SIDEBAR ================= */}
       <Drawer
         variant="temporary"
-        open={isDrawerOpen}
-        onClose={handleDrawerClose}
-        ModalProps={{ keepMounted: true }}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
         sx={{
           "& .MuiDrawer-paper": {
             width: drawerWidth,
-            boxSizing: "border-box",
+            backgroundColor: "#0f172a",
+            color: "#fff",
           },
         }}
       >
         <Toolbar />
-        <Divider />
+        <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+
         <List>
           {menuItems.map((item) => (
             <ListItemButton
-              key={item.text}
+              key={item.label}
+              selected={location.pathname === item.path}
               onClick={() => {
-                setActiveItem(item.text);
-                handleDrawerClose();
+                navigate(item.path);
+                setDrawerOpen(false);
               }}
-              selected={activeItem === item.text}
+              sx={{
+                mx: 1,
+                my: 0.5,
+                borderRadius: 2,
+                "&.Mui-selected": {
+                  background:
+                    "linear-gradient(90deg, rgba(59,130,246,0.2), transparent)",
+                  boxShadow: "0 0 12px rgba(59,130,246,0.4)",
+                },
+              }}
             >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
+              <ListItemIcon sx={{ color: "#fff" }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.label} />
             </ListItemButton>
           ))}
         </List>
       </Drawer>
 
+      {/* ================= MAIN CONTENT ================= */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
-          width: "100%",
+          minHeight: "100vh",
+          p: 4,
+          background: `
+            radial-gradient(circle at 10% 20%, #1e293b 0%, transparent 40%),
+            radial-gradient(circle at 80% 30%, #0f172a 0%, transparent 40%),
+            linear-gradient(135deg, #0f172a, #1e293b)
+          `,
         }}
       >
+        {/* Spacer for fixed Navbar */}
         <Toolbar />
+
         {children}
       </Box>
     </Box>

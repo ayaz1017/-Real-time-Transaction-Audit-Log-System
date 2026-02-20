@@ -1,5 +1,13 @@
-
-import { Grid, Card, CardContent, Typography, useTheme, Box } from "@mui/material";
+// src/components/StatsCards.jsx
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  useTheme,
+} from "@mui/material";
+import CountUp from "react-countup";
 
 export default function StatsCards({
   totalTransactions,
@@ -10,48 +18,40 @@ export default function StatsCards({
   const theme = useTheme();
 
   const stats = [
-    { label: "Today's Volume", value: `₹${successVolume.toLocaleString()}`, trend: 12.5 },
-    { label: "Total Transactions", value: totalTransactions.toString(), trend: 5.2 },
-    { label: "Failed Transactions", value: failedCount.toString(), trend: -2.4 },
-    { label: "Pending Transactions", value: pendingCount.toString(), trend: 1.1 },
+    { label: "Today's Volume", value: successVolume },
+    { label: "Total Transactions", value: totalTransactions },
+    { label: "Failed", value: failedCount },
+    { label: "Pending", value: pendingCount },
   ];
 
   return (
-    <Grid container spacing={2}>
-      {stats.map((item) => {
-        const isPositive = item.trend >= 0;
-        return (
-          <Grid item xs={12} sm={6} md={3} key={item.label}>
-            <Card
-              sx={{
-                height: "100%",
-                transition: "all 0.15s ease-out",
-                "&:hover": { boxShadow: 4, transform: "translateY(-2px)" },
-              }}
-            >
-              <CardContent>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {item.label}
-                </Typography>
-                <Typography variant="h5" sx={{ mt: 1, fontWeight: 700 }}>
-                  {item.value}
-                </Typography>
-                <Box
-                  sx={{
-                    mt: 0.5,
-                    fontSize: 12,
-                    color: isPositive
-                      ? theme.palette.success.main
-                      : theme.palette.error.main,
-                  }}
-                >
-                  {isPositive ? `▲ ${item.trend}%` : `▼ ${Math.abs(item.trend)}%`} from yesterday
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        );
-      })}
+    <Grid container spacing={3}>
+      {stats.map((item) => (
+        <Grid item xs={12} sm={6} md={3} key={item.label}>
+          <Card
+            sx={{
+              backdropFilter: "blur(20px)",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 4,
+              transition: "0.3s",
+              "&:hover": {
+                transform: "translateY(-6px)",
+              },
+            }}
+          >
+            <CardContent>
+              <Typography variant="subtitle2" color="gray">
+                {item.label}
+              </Typography>
+
+              <Typography variant="h4" sx={{ mt: 1 }}>
+                <CountUp end={item.value} duration={1.2} separator="," />
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
     </Grid>
   );
 }
